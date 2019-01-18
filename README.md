@@ -1,5 +1,5 @@
 # Sensu Go Pushbullet Plugin
-TravisCI: [![TravisCI Build Status](https://travis-ci.com/rgeniesse/sensu-pushbullet-handler)](https://travis-ci.org/CHANGEME/sensu-CHANGEME)
+TravisCI: [![TravisCI Build Status](https://travis-ci.com/rgeniesse/sensu-pushbullet-handler.svg?branch=master)](https://travis-ci.com/rgeniesse/sensu-pushbullet-handler)
 
 A Sensu handler plugin for sending notifications via [Pushbullet][2]
 
