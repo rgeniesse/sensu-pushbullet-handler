@@ -7,6 +7,16 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.0.3] - 2019-01-18
+
+### Added
+- Attempt to get CI working 2.0
+
+## [0.0.2] - 2019-01-18
+
+### Added
+- Attempt to get CI working
+
 ## [0.0.1] - 2019-01-18
 
 ### Added
