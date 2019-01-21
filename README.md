@@ -17,14 +17,15 @@ go build -o /usr/local/bin/sensu-pushbullet-handler main.go
 ## Configuration
 
 Example Sensu Go definition:
+_NOTE: It is recommended to use [`state_change_only` filter][3] with this handler. If not used, you will get a notification after each check run during a non-0 exit status.
 
 ```json
 {
     "api_version": "core/v2",
-    "type": "CHANGEME",
+    "type": "Handler",
     "metadata": {
         "namespace": "default",
-        "name": "CHANGEME"
+        "name": "pushbullet"
     },
     "spec": {
         "type": "pipe",
@@ -64,3 +65,4 @@ See https://github.com/sensu/sensu-go/blob/master/CONTRIBUTING.md
 
 [1]: https://github.com/CHANGEME/sensu-CHANGEME/releases
 [2]: https://www.pushbullet.com/
+[3]: https://docs.sensu.io/sensu-go/5.1/reference/filters/#how-do-sensu-filters-work
