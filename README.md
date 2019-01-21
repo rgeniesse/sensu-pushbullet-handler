@@ -16,8 +16,9 @@ go build -o /usr/local/bin/sensu-pushbullet-handler main.go
 
 ## Configuration
 
-Example Sensu Go definition:
 _NOTE: It is recommended to use [`state_change_only` filter][3] with this handler. If not used, you will get a notification after each check run during a non-0 exit status._
+
+Example Sensu Go definition:
 
 ```json
 {
