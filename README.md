@@ -66,4 +66,4 @@ See https://github.com/sensu/sensu-go/blob/master/CONTRIBUTING.md
 
 [1]: https://github.com/CHANGEME/sensu-CHANGEME/releases
 [2]: https://www.pushbullet.com/
-[3]: https://docs.sensu.io/sensu-go/5.1/reference/filters/#how-do-sensu-filters-work
+[3]: https://docs.sensu.io/sensu-go/5.1/reference/filters/#handling-state-change-only
