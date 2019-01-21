@@ -87,7 +87,7 @@ func notifyPushbullet(event *types.Event) error {
 		panic(err)
 	}
 
-	title := event.Check.Name
+	title := fmt.Sprintf("%s/%s", event.Entity.Name, event.Check.Name)
 	message := event.Check.Output
 
 	err = pb.PushNote(devs[0].Iden, title, message)

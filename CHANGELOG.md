@@ -7,6 +7,15 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.0.6] - 2019-01-18
+- Update pushbullet output
+
+## [0.0.5] - 2019-01-18
+- Re-release 0.0.4 to test Sensu bonsai
+
+## [0.0.4] - 2019-01-18
+- Add valid encrypted token
+
 ## [0.0.3] - 2019-01-18
 
 ### Added
