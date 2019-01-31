@@ -7,6 +7,9 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [0.0.7] - 2019-01-18
+- New release for bonsai troubleshooting
+
 ## [0.0.6] - 2019-01-18
 - Update pushbullet output
 
