@@ -33,7 +33,8 @@ Example Sensu Go definition:
         "command": "sensu-pushbullet-handler",
         "timeout": 10,
         "env_vars": [
-            "PUSHBULLET_API_KEY=your_api_key_here"
+            "PUSHBULLET_API_KEY=your_api_key_here",
+            "DEVICE=your_device_name_here"
         ],
         "filters": [
             "is_incident",
@@ -50,14 +51,16 @@ Example Sensu Go definition:
 Help:
 
 ```
-The Sensu Go handler for Pushover
+The Sensu Go handler plugin for pushbullet
 
 Usage:
   sensu-pushbullet-handler [flags]
 
 Flags:
-  -a, --api.token string   Pushbullet API app token, use default from PUSHBULLET_APP_TOKEN env var
-  -h, --help               help for sensu-pushbullet-handler
+      --alldevices      Bool for sending notifications to all devices
+  -d, --device string   A device registered with Pushbullet
+  -h, --help            help for sensu-pushbullet-handler
+  -t, --token string    Pushbullet API app token, use default from PUSHBULLET_APP_TOKEN env var
 ```
 
 ## Contributing
