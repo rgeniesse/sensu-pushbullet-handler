@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -22,8 +23,7 @@ var (
 func main() {
 	rootCmd := configureRootCommand()
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 }
 
@@ -49,35 +49,35 @@ func run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid argument(s) received")
 	}
 
-	if stdin == nil {
-		stdin = os.Stdin
-	}
-
 	if apiToken == "" {
 		_ = cmd.Help()
 		return fmt.Errorf("api token is empty")
 	}
 
+	if stdin == nil {
+		stdin = os.Stdin
+	}
+
 	eventJSON, err := ioutil.ReadAll(stdin)
 	if err != nil {
-		return fmt.Errorf("failed to read stdin: %s", err)
+		return fmt.Errorf("failed to read stdin: %s", err.Error())
 	}
 
 	event := &types.Event{}
 	err = json.Unmarshal(eventJSON, event)
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal stdin data: %s", err)
+		return fmt.Errorf("failed to unmarshal stdin data: %s", err.Error())
 	}
 
-	if err = event.Validate(); err != nil {
-		return fmt.Errorf("failed to validate event: %s", err)
+	if err = validateEvent(event); err != nil {
+		return errors.New(err.Error())
 	}
 
-	if !event.HasCheck() {
-		return fmt.Errorf("event does not contain check")
+	if err = notifyPushbullet(event); err != nil {
+		return errors.New(err.Error())
 	}
 
-	return notifyPushbullet(event)
+	return nil
 }
 
 func notifyPushbullet(event *types.Event) error {
@@ -90,13 +90,37 @@ func notifyPushbullet(event *types.Event) error {
 	title := fmt.Sprintf("%s/%s", event.Entity.Name, event.Check.Name)
 	message := event.Check.Output
 
-	err = pb.PushNote(devs[0].Iden, title, message)
+	err = pb.PushNote(devs[1].Iden, title, message)
 	if err != nil {
 		panic(err)
 	}
 
 	if debug == true {
 		log.Println(err)
+	}
+
+	return nil
+}
+
+func validateEvent(event *types.Event) error {
+	// if event.Timestamp <= 0 {
+	// 	return errors.New("timestamp is missing or must be greater than zero")
+	// }
+
+	if event.Entity == nil {
+		return errors.New("entity is missing from event")
+	}
+
+	if !event.HasCheck() {
+		return errors.New("check is missing from event")
+	}
+
+	if err := event.Entity.Validate(); err != nil {
+		return err
+	}
+
+	if err := event.Check.Validate(); err != nil {
+		return errors.New(err.Error())
 	}
 
 	return nil
