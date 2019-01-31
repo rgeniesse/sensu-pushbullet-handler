@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,17 +14,15 @@ import (
 )
 
 var (
-	apiToken string
-	foo      string
-	stdin    *os.File
-	debug    bool
+	token, device string
+	stdin         *os.File
+	allDevices    bool
 )
 
 func main() {
 	rootCmd := configureRootCommand()
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 }
 
@@ -34,11 +33,22 @@ func configureRootCommand() *cobra.Command {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&apiToken,
-		"api.token",
-		"a",
+	cmd.Flags().StringVarP(&token,
+		"token",
+		"t",
 		os.Getenv("PUSHBULLET_APP_TOKEN"),
 		"Pushbullet API app token, use default from PUSHBULLET_APP_TOKEN env var")
+
+	cmd.Flags().StringVarP(&device,
+		"device",
+		"d",
+		os.Getenv("DEVICE"),
+		"A device registered with Pushbullet")
+
+	cmd.Flags().BoolVar(&allDevices,
+		"alldevices",
+		false,
+		"Bool for sending notifications to all devices")
 
 	return cmd
 }
@@ -49,40 +59,61 @@ func run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid argument(s) received")
 	}
 
-	if stdin == nil {
-		stdin = os.Stdin
-	}
-
-	if apiToken == "" {
+	if token == "" {
 		_ = cmd.Help()
 		return fmt.Errorf("api token is empty")
 	}
 
+	if stdin == nil {
+		stdin = os.Stdin
+	}
+
 	eventJSON, err := ioutil.ReadAll(stdin)
 	if err != nil {
-		return fmt.Errorf("failed to read stdin: %s", err)
+		return fmt.Errorf("failed to read stdin: %s", err.Error())
 	}
 
 	event := &types.Event{}
 	err = json.Unmarshal(eventJSON, event)
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal stdin data: %s", err)
+		return fmt.Errorf("failed to unmarshal stdin data: %s", err.Error())
 	}
 
-	if err = event.Validate(); err != nil {
-		return fmt.Errorf("failed to validate event: %s", err)
+	if err = validateEvent(event); err != nil {
+		return errors.New(err.Error())
 	}
 
-	if !event.HasCheck() {
-		return fmt.Errorf("event does not contain check")
+	if allDevices && device == "" {
+
+		if err = notifyPushbulletAll(event); err != nil {
+			return errors.New(err.Error())
+		}
+
 	}
 
-	return notifyPushbullet(event)
+	if !allDevices && device != "" {
+
+		if err = notifyPushbulletOne(event); err != nil {
+			return errors.New(err.Error())
+		}
+
+	}
+
+	if !allDevices && device == "" {
+		fmt.Printf("%s\n", "Must chose to send notification to all devices or one")
+	}
+
+	if allDevices && device != "" {
+		fmt.Printf("%s\n", "Can not send to all device and one device")
+	}
+
+	return nil
 }
 
-func notifyPushbullet(event *types.Event) error {
-	pb := pushbullet.New(apiToken)
-	devs, err := pb.Devices()
+// Send event notification to all devices
+func notifyPushbulletAll(event *types.Event) error {
+	pushall := pushbullet.New(token)
+	devs, err := pushall.Devices()
 	if err != nil {
 		panic(err)
 	}
@@ -90,13 +121,61 @@ func notifyPushbullet(event *types.Event) error {
 	title := fmt.Sprintf("%s/%s", event.Entity.Name, event.Check.Name)
 	message := event.Check.Output
 
-	err = pb.PushNote(devs[0].Iden, title, message)
+	for i := 0; i < len(devs); i++ {
+
+		err = pushall.PushNote(devs[i].Iden, title, message)
+		// Need to add something better here than a panic.
+		// PB seems to hold onto old device Identities.
+		// For now doing nothing seems ok
+		if err != nil {
+			// panic(err)
+		}
+	}
+
+	return nil
+}
+
+func notifyPushbulletOne(event *types.Event) error {
+	pushone := pushbullet.New(token)
+	dev, err := pushone.Device(device)
 	if err != nil {
 		panic(err)
 	}
 
-	if debug == true {
-		log.Println(err)
+	title := fmt.Sprintf("%s/%s", event.Entity.Name, event.Check.Name)
+	message := event.Check.Output
+
+	err = dev.PushNote(title, message)
+	// Need to add something better here than a panic.
+	// PB seems to hold onto old device Identities.
+	// For now doing nothing seems ok
+	if err != nil {
+		// panic(err)
+	}
+
+	return nil
+}
+
+func validateEvent(event *types.Event) error {
+	// Doesn't work for known sample events.
+	// if event.Timestamp <= 0 {
+	// 	return errors.New("timestamp is missing or must be greater than zero")
+	// }
+
+	if event.Entity == nil {
+		return errors.New("entity is missing from event")
+	}
+
+	if !event.HasCheck() {
+		return errors.New("check is missing from event")
+	}
+
+	if err := event.Entity.Validate(); err != nil {
+		return err
+	}
+
+	if err := event.Check.Validate(); err != nil {
+		return errors.New(err.Error())
 	}
 
 	return nil
