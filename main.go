@@ -15,7 +15,6 @@ import (
 
 var (
 	apiToken string
-	foo      string
 	stdin    *os.File
 	debug    bool
 )
@@ -90,7 +89,7 @@ func notifyPushbullet(event *types.Event) error {
 	title := fmt.Sprintf("%s/%s", event.Entity.Name, event.Check.Name)
 	message := event.Check.Output
 
-	err = pb.PushNote(devs[1].Iden, title, message)
+	err = pb.PushNote(devs[0].Iden, title, message)
 	if err != nil {
 		panic(err)
 	}
