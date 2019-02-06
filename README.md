@@ -33,7 +33,7 @@ Example Sensu Go definition:
         "command": "sensu-pushbullet-handler",
         "timeout": 10,
         "env_vars": [
-            "PUSHBULLET_API_KEY=your_api_key_here",
+            "PUSHBULLET_APP_TOKEN=your_api_key_here",
             "DEVICE=your_device_name_here"
         ],
         "filters": [
