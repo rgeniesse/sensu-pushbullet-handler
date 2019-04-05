@@ -1,5 +1,6 @@
 # Sensu Go Pushbullet Plugin
 TravisCI: [![TravisCI Build Status](https://travis-ci.com/rgeniesse/sensu-pushbullet-handler.svg?branch=master)](https://travis-ci.com/rgeniesse/sensu-pushbullet-handler)
+[![Sensu Bonsai Asset](https://img.shields.io/badge/Bonsai-Download%20Me-brightgreen.svg?colorB=89C967&logo=sensu)](https://bonsai.sensu.io/assets/rgeniesse/sensu-pushbullet-handler)
 
 A Sensu handler plugin for sending notifications via [Pushbullet][2]
 
