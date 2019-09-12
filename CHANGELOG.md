@@ -7,6 +7,14 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+- Removed binary from repo
+
+## [1.0.0] - 2019-02-05
+
+### Fixed
+
+- Fixed readme example
+
 ## [1.0.0] - 2019-01-31
 ### Breaking Changes
 - Modified token flag from `api.token` to `token` and short flag from `a` to `t`.
